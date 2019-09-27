@@ -1,0 +1,81 @@
+---
+version: 2.1
+
+executors:
+  terraform:
+    docker: [image: "hashicorp/terraform"]
+
+jobs:
+  terraform_fmt:
+    executor: terraform
+    steps:
+      - checkout
+      - run:
+          name: Lint Terraform
+          command: terraform fmt -check -recursive
+
+  terraform_validate:
+    executor: terraform
+    parameters:
+      folder:
+        description: Folder to validate
+        type: string
+        default: "."
+      workspace:
+        description: Terraform workspace name
+        type: string
+        default: "default"
+    environment:
+      TF_WORKSPACE: <<parameters.workspace>>
+    steps:
+      - checkout
+      - run:
+          name: Initialize Terraform
+          command: terraform init -upgrade <<parameters.folder>>
+      - run:
+          name: Validate Terraform
+          command: terraform validate <<parameters.folder>>
+
+  terraform_plan:
+    executor: terraform
+    parameters:
+      folder:
+        description: Folder to plan
+        type: string
+        default: "."
+      workspace:
+        description: Terraform workspace name
+        type: string
+        default: "default"
+    environment:
+      TF_WORKSPACE: <<parameters.workspace>>
+    steps:
+      - checkout
+      - run:
+          name: Initialize Terraform
+          command: terraform init -upgrade <<parameters.folder>>
+      - run:
+          name: Plan Terraform
+          command: terraform plan <<parameters.folder>>
+
+  terraform_apply:
+    executor: terraform
+    parameters:
+      folder:
+        description: Folder to validate
+        type: string
+        default: "."
+      workspace:
+        description: Terraform workspace name
+        type: string
+        default: "default"
+    environment:
+      TF_WORKSPACE: <<parameters.workspace>>
+    steps:
+      - checkout
+      - run:
+          name: Initialize Terraform
+          command: terraform init -upgrade <<parameters.folder>>
+      - run:
+          name: Validate Terraform
+          command: terraform validate <<parameters.folder>>
