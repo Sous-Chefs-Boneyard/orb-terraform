@@ -8,7 +8,7 @@ main(){
   git tag "${version}"
   git push --tags
 
-  circleci orb publish orb.yml "sous-chefs/kitchen@${version}"
+  circleci orb publish orb.yml "sous-chefs/terraform@${version}"
 }
 
 main "$@"
