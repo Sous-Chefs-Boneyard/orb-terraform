@@ -1,0 +1,10 @@
+---
+version: 2.1
+orbs:
+  orb-tools: circleci/orb-tools@8
+
+workflows:
+  kitchen:
+    jobs:
+      - orb-tools/lint:
+          name: orb-lint
