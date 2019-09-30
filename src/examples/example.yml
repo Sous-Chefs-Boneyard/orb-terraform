@@ -1,0 +1,17 @@
+---
+version: 2.1
+orbs:
+  terraform: sous-chefs/terraform@1
+
+workflows:
+  terraform:
+    jobs:
+      - terraform/fmt
+      - terraform/validate
+      - terraform/plan:
+          requires:
+            - "terraform/fmt"
+            - "terraform/validate"
+      - terraform/apply:
+          requires:
+            - "terraform/plan"

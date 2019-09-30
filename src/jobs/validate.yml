@@ -1,0 +1,26 @@
+---
+description: Validate terraform
+
+executor: terraform
+
+parameters:
+  folder:
+    description: Folder to validate
+    type: string
+    default: "."
+  workspace:
+    description: Terraform workspace name
+    type: string
+    default: "default"
+
+environment:
+  TF_WORKSPACE: <<parameters.workspace>>
+
+steps:
+  - checkout
+  - run:
+      name: Initialize Terraform
+      command: terraform init -upgrade <<parameters.folder>>
+  - run:
+      name: Validate Terraform
+      command: terraform validate <<parameters.folder>>

@@ -4,7 +4,12 @@ orbs:
   orb-tools: circleci/orb-tools@8
 
 workflows:
-  kitchen:
+  publish:
     jobs:
-      - orb-tools/lint:
-          name: orb-lint
+      - orb-tools/lint
+      - orb-tools/pack:
+          requires: ["orb-tools/lint"]
+    - orb-tools/publish-dev:
+        orb-name: sous-chefs/terraform
+        context: orb-publishing
+        requires: [orb-tools/pack]
