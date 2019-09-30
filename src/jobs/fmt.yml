@@ -1,0 +1,8 @@
+---
+executor: terraform
+
+steps:
+  - checkout
+  - run:
+      name: Lint Terraform
+      command: terraform fmt -check -recursive
