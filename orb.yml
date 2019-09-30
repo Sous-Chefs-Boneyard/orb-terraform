@@ -1,81 +1,99 @@
----
-version: 2.1
-
+description: Plan, Validate & Apply Terraform
+examples:
+  example:
+    description: Plan and apply terraform after validating
+    usage:
+      orbs:
+        terraform: sous-chefs/terraform@1
+      version: 2.1
+      workflows:
+        terraform:
+          jobs:
+          - terraform/fmt
+          - terraform/validate
+          - terraform/plan:
+              requires:
+              - terraform/fmt
+              - terraform/validate
+          - terraform/apply:
+              requires:
+              - terraform/plan
 executors:
   terraform:
-    docker: [image: "hashicorp/terraform"]
-
+    description: Hashicorp image without CircleCI convenience tools installed
+    docker:
+    - image: hashicorp/terraform
 jobs:
-  terraform_fmt:
-    executor: terraform
-    steps:
-      - checkout
-      - run:
-          name: Lint Terraform
-          command: terraform fmt -check -recursive
-
-  terraform_validate:
-    executor: terraform
-    parameters:
-      folder:
-        description: Folder to validate
-        type: string
-        default: "."
-      workspace:
-        description: Terraform workspace name
-        type: string
-        default: "default"
+  apply:
     environment:
       TF_WORKSPACE: <<parameters.workspace>>
-    steps:
-      - checkout
-      - run:
-          name: Initialize Terraform
-          command: terraform init -upgrade <<parameters.folder>>
-      - run:
-          name: Validate Terraform
-          command: terraform validate <<parameters.folder>>
-
-  terraform_plan:
     executor: terraform
     parameters:
       folder:
+        default: .
+        description: Folder to validate
+        type: string
+      workspace:
+        default: default
+        description: Terraform workspace name
+        type: string
+    steps:
+    - checkout
+    - run:
+        command: terraform init -upgrade <<parameters.folder>>
+        name: Initialize Terraform
+    - run:
+        command: terraform validate <<parameters.folder>>
+        name: Validate Terraform
+  fmt:
+    executor: terraform
+    steps:
+    - checkout
+    - run:
+        command: terraform fmt -check -recursive
+        name: Lint Terraform
+  plan:
+    environment:
+      TF_WORKSPACE: <<parameters.workspace>>
+    executor: terraform
+    parameters:
+      folder:
+        default: .
         description: Folder to plan
         type: string
-        default: "."
       workspace:
+        default: default
         description: Terraform workspace name
         type: string
-        default: "default"
+    steps:
+    - checkout
+    - run:
+        command: terraform init -upgrade <<parameters.folder>>
+        name: Initialize Terraform
+    - run:
+        command: terraform plan <<parameters.folder>>
+        name: Plan Terraform
+  validate:
+    description: Validate terraform
     environment:
       TF_WORKSPACE: <<parameters.workspace>>
-    steps:
-      - checkout
-      - run:
-          name: Initialize Terraform
-          command: terraform init -upgrade <<parameters.folder>>
-      - run:
-          name: Plan Terraform
-          command: terraform plan <<parameters.folder>>
-
-  terraform_apply:
     executor: terraform
     parameters:
       folder:
+        default: .
         description: Folder to validate
         type: string
-        default: "."
       workspace:
+        default: default
         description: Terraform workspace name
         type: string
-        default: "default"
-    environment:
-      TF_WORKSPACE: <<parameters.workspace>>
     steps:
-      - checkout
-      - run:
-          name: Initialize Terraform
-          command: terraform init -upgrade <<parameters.folder>>
-      - run:
-          name: Validate Terraform
-          command: terraform validate <<parameters.folder>>
+    - checkout
+    - run:
+        command: terraform init -upgrade <<parameters.folder>>
+        name: Initialize Terraform
+    - run:
+        command: terraform validate <<parameters.folder>>
+        name: Validate Terraform
+version: 2.1
+
