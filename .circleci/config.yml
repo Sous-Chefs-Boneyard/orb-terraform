@@ -1,15 +1,15 @@
 ---
 version: 2.1
 orbs:
+  kitchen: sous-chefs/kitchen@2
   orb-tools: circleci/orb-tools@8
 
 workflows:
-  publish:
+  kitchen:
     jobs:
-      - orb-tools/lint
-      - orb-tools/pack:
-          requires: ["orb-tools/lint"]
-      - orb-tools/publish-dev:
-          orb-name: sous-chefs/terraform
-          context: orb-publishing
-          requires: [orb-tools/pack]
+      # Lint and Unit Test
+      - kitchen/danger:
+          name: danger
+          context: Danger
+      - orb-tools/lint:
+          name: orb-lint
